@@ -1,368 +1,843 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FutureCorp 2026 營業額 Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <style>
-    :root {
-      --bg: #f0f4f8;
-      --card: #ffffff;
-      --primary: #2563eb;
-      --primary-light: #eff6ff;
-      --text: #1e293b;
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --success: #16a34a;
-      --warning: #d97706;
-      --danger: #dc2626;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans TC", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      min-height: 100vh;
-      padding: 24px;
-    }
-    header {
-      max-width: 1200px;
-      margin: 0 auto 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    header h1 { font-size: 1.5rem; font-weight: 700; color: var(--primary); }
-    header p { font-size: 0.85rem; color: var(--muted); margin-top: 2px; }
-    .badge {
-      background: var(--primary-light);
-      color: var(--primary);
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FutureCorp 2026 年度營運報告</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    .container { max-width: 1200px; margin: 0 auto; }
+  :root {
+    --primary: #1a1f3c;
+    --accent: #4f6ef7;
+    --accent2: #22d3a6;
+    --accent3: #f59e0b;
+    --accent4: #ef4444;
+    --bg: #f0f2f8;
+    --card: #ffffff;
+    --text: #1e2333;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --gradient: linear-gradient(135deg, #1a1f3c 0%, #2d3464 50%, #1a2a4a 100%);
+  }
 
-    /* KPI Cards */
-    .kpi-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    .kpi-card {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
-      border: 1px solid var(--border);
-      transition: transform 0.15s;
-    }
-    .kpi-card:hover { transform: translateY(-2px); }
-    .kpi-label { font-size: 0.78rem; color: var(--muted); font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 8px; }
-    .kpi-value { font-size: 1.9rem; font-weight: 800; color: var(--text); line-height: 1; }
-    .kpi-value.primary { color: var(--primary); }
-    .kpi-sub { font-size: 0.8rem; color: var(--muted); margin-top: 6px; }
-    .kpi-change { display: inline-block; font-size: 0.78rem; font-weight: 600; padding: 2px 8px; border-radius: 12px; margin-top: 6px; }
-    .up { background: #dcfce7; color: var(--success); }
-    .down { background: #fee2e2; color: var(--danger); }
+  body {
+    font-family: 'Segoe UI', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
 
-    /* Charts */
-    .chart-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr;
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-    @media (max-width: 768px) { .chart-grid { grid-template-columns: 1fr; } }
+  .header {
+    background: var(--gradient);
+    color: white;
+    padding: 40px 40px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -80px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(79,110,247,0.15);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    bottom: -40px; left: 30%;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(34,211,166,0.1);
+  }
+  .header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .header-badge {
+    display: inline-block;
+    background: rgba(79,110,247,0.3);
+    border: 1px solid rgba(79,110,247,0.5);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 12px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    color: #a5b4fc;
+  }
+  .header h1 {
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+  .header h1 span { color: #22d3a6; }
+  .header p {
+    font-size: 0.95rem;
+    color: rgba(255,255,255,0.65);
+    margin-top: 8px;
+  }
+  .header-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+  .header-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+  }
+  .header-meta-item .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #22d3a6;
+  }
 
-    .chart-card {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
-      border: 1px solid var(--border);
-    }
-    .chart-title { font-size: 0.95rem; font-weight: 700; color: var(--text); margin-bottom: 16px; }
-    .chart-wrap { position: relative; height: 260px; }
+  .main {
+    max-width: 1200px;
+    margin: -20px auto 0;
+    padding: 0 24px 60px;
+    position: relative;
+    z-index: 2;
+  }
 
-    /* Customer Table */
-    .table-card {
-      background: var(--card);
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
-      border: 1px solid var(--border);
-      margin-bottom: 24px;
-    }
-    table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-    thead th {
-      text-align: left;
-      padding: 10px 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 2px solid var(--border);
-    }
-    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
-    tbody tr:hover { background: #f8fafc; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody td { padding: 12px 12px; }
-    .progress-bar-bg { background: var(--border); border-radius: 4px; height: 6px; width: 120px; }
-    .progress-bar { height: 6px; border-radius: 4px; background: var(--primary); }
-    .rank-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 22px; height: 22px;
-      border-radius: 50%;
-      font-size: 0.75rem;
-      font-weight: 700;
-    }
-    .rank-1 { background: #fef3c7; color: #92400e; }
-    .rank-2 { background: #f1f5f9; color: #475569; }
-    .rank-3 { background: #fff7ed; color: #9a3412; }
-    .rank-n { background: #f8fafc; color: var(--muted); }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .kpi-card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    border: 1px solid #e5e7eb;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.1);
+  }
+  .kpi-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    margin-bottom: 14px;
+  }
+  .kpi-icon.blue { background: rgba(79,110,247,0.12); }
+  .kpi-icon.green { background: rgba(34,211,166,0.12); }
+  .kpi-icon.amber { background: rgba(245,158,11,0.12); }
+  .kpi-icon.red { background: rgba(239,68,68,0.12); }
+  .kpi-icon.purple { background: rgba(139,92,246,0.12); }
+  .kpi-label {
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+  .kpi-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #1e2333;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .kpi-sub {
+    font-size: 12px;
+    color: #6b7280;
+  }
+  .kpi-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .kpi-badge.info { background: rgba(79,110,247,0.1); color: #4f6ef7; }
 
-    /* Month detail */
-    .month-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-    .month-card {
-      background: var(--card);
-      border-radius: 10px;
-      padding: 14px 16px;
-      border: 1px solid var(--border);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-    }
-    .month-name { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
-    .month-value { font-size: 1.2rem; font-weight: 800; margin: 4px 0; }
-    .month-bar-bg { background: var(--border); border-radius: 3px; height: 4px; }
-    .month-bar { height: 4px; border-radius: 3px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
+  @media (max-width: 768px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .header h1 { font-size: 1.6rem; }
+  }
 
-    footer { text-align: center; color: var(--muted); font-size: 0.78rem; margin-top: 32px; }
-  </style>
+  .section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #6b7280;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e5e7eb;
+  }
+
+  .card {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    border: 1px solid #e5e7eb;
+  }
+  .card-title { font-size: 15px; font-weight: 600; margin-bottom: 6px; color: #1e2333; }
+  .card-sub { font-size: 12px; color: #6b7280; margin-bottom: 20px; }
+
+  .chart-wrap { position: relative; height: 240px; }
+  .chart-wrap.tall { height: 280px; }
+
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    background: #f8f9fc;
+    padding: 10px 12px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 11px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 2px solid #e5e7eb;
+  }
+  td { padding: 11px 12px; border-bottom: 1px solid #f3f4f8; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #f9fafb; }
+
+  .stage {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .stage-new { background: #f1f5ff; color: #4f6ef7; }
+  .stage-eval { background: #fffbeb; color: #d97706; }
+  .stage-prop { background: #fff1f5; color: #e11d48; }
+  .stage-won { background: #ecfdf5; color: #059669; }
+
+  .progress-row { margin-bottom: 16px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
+  .progress-label span:first-child { font-weight: 500; }
+  .progress-label span:last-child { color: #6b7280; font-size: 12px; }
+  .progress-bar-bg { height: 8px; background: #f0f2f8; border-radius: 4px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 4px; }
+
+  .funnel-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #f8f9fc;
+  }
+  .funnel-stage-name { min-width: 90px; font-size: 13px; font-weight: 600; }
+  .funnel-bar-wrap { flex: 1; }
+  .funnel-right { min-width: 120px; text-align: right; font-size: 12px; color: #6b7280; }
+  .funnel-right strong { display: block; font-size: 14px; font-weight: 700; color: #1e2333; }
+
+  .monthly-num { font-weight: 700; color: #1e2333; }
+
+  .rep-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .rep-card:last-child { border-bottom: none; }
+  .rep-avatar {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+  .rep-info { flex: 1; }
+  .rep-name { font-weight: 600; font-size: 14px; margin-bottom: 4px; }
+  .rep-stats { font-size: 12px; color: #6b7280; }
+  .rep-revenue { font-size: 16px; font-weight: 700; color: #1e2333; text-align: right; }
+
+  .footer {
+    text-align: center;
+    padding: 28px;
+    font-size: 12px;
+    color: #6b7280;
+    border-top: 1px solid #e5e7eb;
+    background: white;
+  }
+
+  .tab-nav {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 24px;
+    background: white;
+    padding: 6px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    border: 1px solid #e5e7eb;
+    overflow-x: auto;
+  }
+  .tab-btn {
+    padding: 8px 18px;
+    border-radius: 8px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    color: #6b7280;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .tab-btn.active {
+    background: #1a1f3c;
+    color: white;
+    box-shadow: 0 2px 8px rgba(26,31,60,0.25);
+  }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .insight-box {
+    background: linear-gradient(135deg, #f0f4ff, #e8f9f5);
+    border: 1px solid #c7d7ff;
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-top: 16px;
+  }
+  .insight-box .insight-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #4f6ef7;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+  }
+  .insight-box ul { list-style: none; padding: 0; }
+  .insight-box ul li {
+    font-size: 13px;
+    color: #1e2333;
+    padding: 3px 0;
+    padding-left: 18px;
+    position: relative;
+  }
+  .insight-box ul li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: #22d3a6;
+    font-weight: 700;
+  }
+</style>
 </head>
 <body>
 
-<header>
-  <div>
-    <h1>📊 FutureCorp 營業額 Dashboard</h1>
-    <p>2026 年度 · 已確認訂單 · 截至 5 月 13 日</p>
-  </div>
-  <span class="badge">即時數據</span>
-</header>
-
-<div class="container">
-
-  <!-- KPI Cards -->
-  <div class="kpi-grid">
-    <div class="kpi-card">
-      <div class="kpi-label">年度總營業額</div>
-      <div class="kpi-value primary">$97,910</div>
-      <div class="kpi-sub">已確認訂單合計</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">最大客戶貢獻</div>
-      <div class="kpi-value">71.7%</div>
-      <div class="kpi-sub">Acme Corp — $70,250</div>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">本月營業額（5月）</div>
-      <div class="kpi-value">$6,813</div>
-      <span class="kpi-change up">↑ 62% vs 上月</span>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">上月營業額（4月）</div>
-      <div class="kpi-value">$4,203</div>
-      <span class="kpi-change down">↓ 28.5% vs 3月</span>
-    </div>
-    <div class="kpi-card">
-      <div class="kpi-label">客戶數</div>
-      <div class="kpi-value">5</div>
-      <div class="kpi-sub">2026 年活躍客戶</div>
+<div class="header">
+  <div class="header-inner">
+    <div class="header-badge">Annual Report · PTC Heater</div>
+    <h1>FutureCorp <span>2026</span> 年度營運報告</h1>
+    <p>截至 2026/05/14 | 資料來源：Odoo ERP 即時同步</p>
+    <div class="header-meta">
+      <div class="header-meta-item"><div class="dot"></div>22 筆確認訂單</div>
+      <div class="header-meta-item"><div class="dot" style="background:#f59e0b"></div>4 位有效客戶</div>
+      <div class="header-meta-item"><div class="dot" style="background:#a78bfa"></div>56 個 CRM 商機</div>
+      <div class="header-meta-item"><div class="dot" style="background:#ef4444"></div>2 位業務</div>
     </div>
   </div>
+</div>
 
-  <!-- Charts -->
-  <div class="chart-grid">
-    <div class="chart-card">
-      <div class="chart-title">📈 月度營業額趨勢</div>
-      <div class="chart-wrap">
-        <canvas id="monthChart"></canvas>
+<div class="main">
+
+  <div class="kpi-grid" style="margin-top:28px;">
+    <div class="kpi-card">
+      <div class="kpi-icon blue">💰</div>
+      <div class="kpi-label">年度總營收（YTD）</div>
+      <div class="kpi-value">$102,926</div>
+      <div class="kpi-sub">2026/01 — 05/13</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon green">📦</div>
+      <div class="kpi-label">確認訂單數</div>
+      <div class="kpi-value">22</div>
+      <div class="kpi-sub">全年已確認出貨</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon amber">👥</div>
+      <div class="kpi-label">有效客戶數</div>
+      <div class="kpi-value">4</div>
+      <div class="kpi-sub">Acme、雙星、王志明、林木建材</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon purple">🎯</div>
+      <div class="kpi-label">CRM 管道預估</div>
+      <div class="kpi-value">$725,444</div>
+      <div class="kpi-sub">56 個商機合計</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon blue">📊</div>
+      <div class="kpi-label">平均訂單金額</div>
+      <div class="kpi-value">$4,679</div>
+      <div class="kpi-sub">$102,926 ÷ 22 筆</div>
+    </div>
+  </div>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('revenue',this)">💹 營收分析</button>
+    <button class="tab-btn" onclick="switchTab('customers',this)">👥 客戶分析</button>
+    <button class="tab-btn" onclick="switchTab('sales',this)">🏆 業務績效</button>
+    <button class="tab-btn" onclick="switchTab('crm',this)">🎯 CRM 管道</button>
+    <button class="tab-btn" onclick="switchTab('orders',this)">📋 訂單明細</button>
+  </div>
+
+  <!-- TAB: REVENUE -->
+  <div id="tab-revenue" class="tab-content active">
+    <div class="section-title">月度營收趨勢</div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">月度營收</div>
+        <div class="card-sub">2026 年 1–5 月（5月截至 5/13）</div>
+        <div class="chart-wrap tall">
+          <canvas id="chartMonthly"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">各月份摘要</div>
+        <div class="card-sub">訂單筆數與金額</div>
+        <div style="margin-top:8px;">
+          <div class="progress-row">
+            <div class="progress-label"><span>1月</span><span>$59,543 · 5筆</span></div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:100%;background:linear-gradient(90deg,#4f6ef7,#818cf8)"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span>2月</span><span>$21,476 · 4筆</span></div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:36%;background:linear-gradient(90deg,#22d3a6,#34d399)"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span>3月</span><span>$5,876 · 4筆</span></div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:10%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span>4月</span><span>$4,203 · 4筆</span></div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:7%;background:linear-gradient(90deg,#ef4444,#f87171)"></div></div>
+          </div>
+          <div class="progress-row">
+            <div class="progress-label"><span>5月 *</span><span>$11,828 · 5筆</span></div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:20%;background:linear-gradient(90deg,#8b5cf6,#a78bfa)"></div></div>
+          </div>
+        </div>
+        <p style="font-size:11px;color:#6b7280;margin-top:16px;">* 5月截至 2026/05/13</p>
+        <div class="insight-box">
+          <div class="insight-title">📌 重點觀察</div>
+          <ul>
+            <li>1月因 Acme $53K 大單佔全年 57.8%</li>
+            <li>3–4月為低谷，月均約 $5,040</li>
+            <li>5月初已明顯反彈，雙星家具大量回購</li>
+            <li>5/13 Acme 再下單 $5,015，趨勢向上</li>
+          </ul>
+        </div>
       </div>
     </div>
-    <div class="chart-card">
-      <div class="chart-title">🥧 客戶佔比</div>
-      <div class="chart-wrap">
-        <canvas id="pieChart"></canvas>
+  </div>
+
+  <!-- TAB: CUSTOMERS -->
+  <div id="tab-customers" class="tab-content">
+    <div class="section-title">客戶結構分析</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">客戶營收佔比</div>
+        <div class="card-sub">2026 年 1–5 月</div>
+        <div class="chart-wrap">
+          <canvas id="chartCustomer"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">客戶詳細數據</div>
+        <div class="card-sub">各客戶總金額與佔比</div>
+        <div class="table-wrap" style="margin-top:8px;">
+          <table>
+            <thead>
+              <tr><th>客戶</th><th>訂單</th><th>總金額</th><th>佔比</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Acme Corporation</strong></td>
+                <td>3</td>
+                <td class="monthly-num">$75,265</td>
+                <td><span class="kpi-badge info">73.1%</span></td>
+              </tr>
+              <tr>
+                <td><strong>雙星家具股份有限公司</strong></td>
+                <td>17</td>
+                <td class="monthly-num">$23,963</td>
+                <td><span class="kpi-badge info">23.3%</span></td>
+              </tr>
+              <tr>
+                <td><strong>王志明</strong></td>
+                <td>1</td>
+                <td class="monthly-num">$2,948</td>
+                <td><span class="kpi-badge info">2.9%</span></td>
+              </tr>
+              <tr>
+                <td><strong>林木建材股份有限公司</strong></td>
+                <td>1</td>
+                <td class="monthly-num">$750</td>
+                <td><span class="kpi-badge info">0.7%</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="insight-box">
+          <div class="insight-title">⚠️ 風險提示</div>
+          <ul>
+            <li>Acme 單一客戶依賴度高達 73.1%</li>
+            <li>雙星家具高頻率訂單（17筆），為主力長尾客</li>
+            <li>林木建材為 4 月新拓客戶，有待後續深化</li>
+            <li>CRM 中 56 個商機正積極開發新客戶</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- Monthly breakdown -->
-  <div class="month-grid">
-    <div class="month-card">
-      <div class="month-name">1 月</div>
-      <div class="month-value" style="color:#2563eb">$59,542</div>
-      <div class="month-bar-bg"><div class="month-bar" style="width:100%;background:#2563eb;"></div></div>
+  <!-- TAB: SALES -->
+  <div id="tab-sales" class="tab-content">
+    <div class="section-title">業務績效</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">業務月度業績比較</div>
+        <div class="card-sub">2026 年 1–5 月</div>
+        <div class="chart-wrap">
+          <canvas id="chartSales"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">業務績效摘要</div>
+        <div class="card-sub">YTD 總業績</div>
+        <div class="rep-card">
+          <div class="rep-avatar" style="background:#eef2ff;color:#4f6ef7;">陳</div>
+          <div class="rep-info">
+            <div class="rep-name">陳建宏</div>
+            <div class="rep-stats">7 筆 · Acme、王志明、林木建材</div>
+            <div style="margin-top:6px;">
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:75.7%;background:linear-gradient(90deg,#4f6ef7,#818cf8)"></div></div>
+            </div>
+          </div>
+          <div class="rep-revenue">$77,894<br><small style="color:#6b7280;font-weight:400">75.7%</small></div>
+        </div>
+        <div class="rep-card">
+          <div class="rep-avatar" style="background:#ecfdf5;color:#059669;">林</div>
+          <div class="rep-info">
+            <div class="rep-name">林雅婷</div>
+            <div class="rep-stats">15 筆 · 雙星家具、Acme</div>
+            <div style="margin-top:6px;">
+              <div class="progress-bar-bg"><div class="progress-bar-fill" style="width:24.3%;background:linear-gradient(90deg,#22d3a6,#34d399)"></div></div>
+            </div>
+          </div>
+          <div class="rep-revenue">$25,032<br><small style="color:#6b7280;font-weight:400">24.3%</small></div>
+        </div>
+        <div class="insight-box" style="margin-top:20px;">
+          <div class="insight-title">📌 業績觀察</div>
+          <ul>
+            <li>陳建宏：靠 1–2 月大單撐起整體</li>
+            <li>林雅婷：5月強力反彈，15筆高頻訂單</li>
+            <li>5月林雅婷拿下 Acme 訂單，客戶範圍擴大</li>
+          </ul>
+        </div>
+      </div>
     </div>
-    <div class="month-card">
-      <div class="month-name">2 月</div>
-      <div class="month-value" style="color:#7c3aed">$21,476</div>
-      <div class="month-bar-bg"><div class="month-bar" style="width:36%;background:#7c3aed;"></div></div>
-    </div>
-    <div class="month-card">
-      <div class="month-name">3 月</div>
-      <div class="month-value" style="color:#0891b2">$5,876</div>
-      <div class="month-bar-bg"><div class="month-bar" style="width:10%;background:#0891b2;"></div></div>
-    </div>
-    <div class="month-card">
-      <div class="month-name">4 月</div>
-      <div class="month-value" style="color:#dc2626">$4,203</div>
-      <div class="month-bar-bg"><div class="month-bar" style="width:7%;background:#dc2626;"></div></div>
-    </div>
-    <div class="month-card">
-      <div class="month-name">5 月（進行中）</div>
-      <div class="month-value" style="color:#16a34a">$6,813</div>
-      <div class="month-bar-bg"><div class="month-bar" style="width:11%;background:#16a34a;"></div></div>
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">月度業務業績明細</div>
+      <div class="card-sub">陳建宏 vs 林雅婷 各月份比較</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>月份</th><th>陳建宏</th><th>林雅婷</th><th>月度合計</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1 月</td><td class="monthly-num">$54,706</td><td class="monthly-num">$4,837</td><td class="monthly-num">$59,543</td></tr>
+            <tr><td>2 月</td><td class="monthly-num">$17,250</td><td class="monthly-num">$4,226</td><td class="monthly-num">$21,476</td></tr>
+            <tr><td>3 月</td><td class="monthly-num">$2,948</td><td class="monthly-num">$2,929</td><td class="monthly-num">$5,876</td></tr>
+            <tr><td>4 月</td><td class="monthly-num">$2,990</td><td class="monthly-num">$1,213</td><td class="monthly-num">$4,203</td></tr>
+            <tr><td>5 月 *</td><td class="monthly-num">$0</td><td class="monthly-num">$11,828</td><td class="monthly-num">$11,828</td></tr>
+            <tr style="background:#f8f9fc;font-weight:700;">
+              <td>合計</td>
+              <td class="monthly-num">$77,894</td>
+              <td class="monthly-num">$25,032</td>
+              <td class="monthly-num">$102,926</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 
-  <!-- Customer Table -->
-  <div class="table-card">
-    <div class="chart-title">👥 客戶排行</div>
-    <table>
-      <thead>
-        <tr>
-          <th>排名</th>
-          <th>客戶名稱</th>
-          <th>總金額</th>
-          <th>佔比</th>
-          <th>視覺化</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><span class="rank-badge rank-1">1</span></td>
-          <td>Acme Corp</td>
-          <td><strong>$70,250</strong></td>
-          <td>71.7%</td>
-          <td><div class="progress-bar-bg"><div class="progress-bar" style="width:100%;background:#2563eb;"></div></div></td>
-        </tr>
-        <tr>
-          <td><span class="rank-badge rank-2">2</span></td>
-          <td>雙星家具股份有限公司</td>
-          <td><strong>$23,963</strong></td>
-          <td>24.5%</td>
-          <td><div class="progress-bar-bg"><div class="progress-bar" style="width:34%;background:#7c3aed;"></div></div></td>
-        </tr>
-        <tr>
-          <td><span class="rank-badge rank-3">3</span></td>
-          <td>王志明</td>
-          <td><strong>$2,948</strong></td>
-          <td>3.0%</td>
-          <td><div class="progress-bar-bg"><div class="progress-bar" style="width:4%;background:#f59e0b;"></div></div></td>
-        </tr>
-        <tr>
-          <td><span class="rank-badge rank-n">4</span></td>
-          <td>林木建材股份有限公司</td>
-          <td><strong>$750</strong></td>
-          <td>0.8%</td>
-          <td><div class="progress-bar-bg"><div class="progress-bar" style="width:1%;background:#10b981;"></div></div></td>
-        </tr>
-      </tbody>
-    </table>
+  <!-- TAB: CRM -->
+  <div id="tab-crm" class="tab-content">
+    <div class="section-title">CRM 商機管道</div>
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon blue">🆕</div>
+        <div class="kpi-label">新潛在客戶</div>
+        <div class="kpi-value">21</div>
+        <div class="kpi-sub">預估 $11,475</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon amber">🔍</div>
+        <div class="kpi-label">已評估</div>
+        <div class="kpi-value">17</div>
+        <div class="kpi-sub">預估 $312,568</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon red">📝</div>
+        <div class="kpi-label">提案中</div>
+        <div class="kpi-value">12</div>
+        <div class="kpi-sub">預估 $337,601</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon green">✅</div>
+        <div class="kpi-label">成交</div>
+        <div class="kpi-value">6</div>
+        <div class="kpi-sub">預估 $63,800</div>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">管道漏斗</div>
+        <div class="card-sub">各階段預估金額</div>
+        <div style="margin-top:16px;">
+          <div class="funnel-row" style="background:#f0f4ff;">
+            <div class="funnel-stage-name"><span class="stage stage-new">新潛在</span></div>
+            <div class="funnel-bar-wrap"><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:2%;background:#4f6ef7;"></div></div></div>
+            <div class="funnel-right"><strong>$11,475</strong>21 個商機</div>
+          </div>
+          <div class="funnel-row" style="background:#fffbeb;">
+            <div class="funnel-stage-name"><span class="stage stage-eval">已評估</span></div>
+            <div class="funnel-bar-wrap"><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:43%;background:#d97706;"></div></div></div>
+            <div class="funnel-right"><strong>$312,568</strong>17 個商機</div>
+          </div>
+          <div class="funnel-row" style="background:#fff1f5;">
+            <div class="funnel-stage-name"><span class="stage stage-prop">提案中</span></div>
+            <div class="funnel-bar-wrap"><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:47%;background:#e11d48;"></div></div></div>
+            <div class="funnel-right"><strong>$337,601</strong>12 個商機</div>
+          </div>
+          <div class="funnel-row" style="background:#ecfdf5;">
+            <div class="funnel-stage-name"><span class="stage stage-won">成交</span></div>
+            <div class="funnel-bar-wrap"><div class="progress-bar-bg"><div class="progress-bar-fill" style="width:9%;background:#059669;"></div></div></div>
+            <div class="funnel-right"><strong>$63,800</strong>6 個商機</div>
+          </div>
+        </div>
+        <div style="margin-top:14px;padding:14px;background:#f8f9fc;border-radius:10px;text-align:center;">
+          <div style="font-size:11px;color:#6b7280;">管道總預估金額</div>
+          <div style="font-size:26px;font-weight:700;color:#1a1f3c;">$725,444</div>
+          <div style="font-size:11px;color:#6b7280;">56 個商機</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">商機階段分布</div>
+        <div class="card-sub">各階段商機數量</div>
+        <div class="chart-wrap">
+          <canvas id="chartCRM"></canvas>
+        </div>
+        <div class="insight-box">
+          <div class="insight-title">📌 5/13 企業主AI課新增商機</div>
+          <ul>
+            <li>吳詩芳 — 元植管理顧問</li>
+            <li>林維鍾 — 中偉科技</li>
+            <li>陳復宇 — Beyond 360 Group</li>
+            <li>葉婷阡 — 智伴所有限公司</li>
+            <li>林廣哲 — 典華 DENWELL</li>
+            <li>Phil Hauser — Flamingo Pharmacy</li>
+            <li>Harumi Kobayashi — Condé Villas</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB: ORDERS -->
+  <div id="tab-orders" class="tab-content">
+    <div class="section-title">訂單明細</div>
+    <div class="card">
+      <div class="card-title">2026 年所有已確認訂單（22 筆）</div>
+      <div class="card-sub">按日期降序排列</div>
+      <div class="table-wrap" style="margin-top:12px;">
+        <table>
+          <thead>
+            <tr><th>訂單號</th><th>日期</th><th>客戶</th><th>業務</th><th>金額</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>S00027</strong></td><td>2026/05/13</td><td>Acme Corporation</td><td>林雅婷</td><td class="monthly-num">$5,015</td></tr>
+            <tr><td><strong>S00017</strong></td><td>2026/05/12</td><td>雙星家具</td><td>林雅婷</td><td class="monthly-num">$951</td></tr>
+            <tr><td><strong>S00011</strong></td><td>2026/05/06</td><td>雙星家具</td><td>林雅婷</td><td class="monthly-num">$1,097</td></tr>
+            <tr><td><strong>S00023</strong></td><td>2026/05/05</td><td>雙星家具</td><td>林雅婷</td><td class="monthly-num">$4,350</td></tr>
+            <tr><td><strong>S00013</strong></td><td>2026/05/07</td><td>雙星家具</td><td>林雅婷</td><td class="monthly-num">$416</td></tr>
+            <tr><td><strong>S00006</strong></td><td>2026/04/29</td><td>林木建材</td><td>陳建宏</td><td class="monthly-num">$750</td></tr>
+            <tr><td><strong>S00004</strong></td><td>2026/04/28</td><td>雙星家具</td><td>陳建宏</td><td class="monthly-num">$2,240</td></tr>
+            <tr><td><strong>S00010</strong></td><td>2026/04/21</td><td>雙星家具</td><td>林雅婷</td><td class="monthly-num">$751</td></tr>
+            <tr><td><strong>S00008</strong></td><td>2026/04/17</td><td>雙星家具</td><td>林雅婷</td><td class="monthly-num">$462</td></tr>
+            <tr><td><strong>S00018</strong></td><td>2026/03/23</td><td>雙星家具</td><td>林雅婷</td><td class="monthly-num">$831</td></tr>
+            <tr><td><strong>S00012</strong></td><td>2026/03/23</td><td>雙星家具</td><td>林雅婷</td><td class="monthly-num">$556</td></tr>
+            <tr><td><strong>S00020</strong></td><td>2026/03/18</td><td>王志明</td><td>陳建宏</td><td class="monthly-num">$2,948</td></tr>
+            <tr><td><strong>S00015</strong></td><td>2026/03/05</td><td>雙星家具</td><td>林雅婷</td><td class="monthly-num">$1,542</td></tr>
+            <tr><td><strong>S00024</strong></td><td>2026/02/27</td><td>雙星家具</td><td>林雅婷</td><td class="monthly-num">$1,990</td></tr>
+            <tr><td><strong>S00014</strong></td><td>2026/02/26</td><td>雙星家具</td><td>林雅婷</td><td class="monthly-num">$1,582</td></tr>
+            <tr><td><strong>S00009</strong></td><td>2026/02/25</td><td>雙星家具</td><td>林雅婷</td><td class="monthly-num">$654</td></tr>
+            <tr><td><strong>S00025</strong></td><td>2026/02/09</td><td>Acme Corporation</td><td>陳建宏</td><td class="monthly-num">$17,250</td></tr>
+            <tr><td><strong>S00021</strong></td><td>2026/01/30</td><td>雙星家具</td><td>林雅婷</td><td class="monthly-num">$2,175</td></tr>
+            <tr><td><strong>S00016</strong></td><td>2026/01/15</td><td>雙星家具</td><td>林雅婷</td><td class="monthly-num">$1,187</td></tr>
+            <tr><td><strong>S00022</strong></td><td>2026/01/09</td><td>雙星家具</td><td>林雅婷</td><td class="monthly-num">$1,475</td></tr>
+            <tr><td><strong>S00007</strong></td><td>2026/01/02</td><td>雙星家具</td><td>陳建宏</td><td class="monthly-num">$1,706</td></tr>
+            <tr><td><strong>S00026</strong></td><td>2026/01/05</td><td>Acme Corporation</td><td>陳建宏</td><td class="monthly-num">$53,000</td></tr>
+            <tr style="background:#f8f9fc;font-weight:700;">
+              <td colspan="4">合計</td>
+              <td class="monthly-num">$102,926</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
 </div>
 
-<footer>
-  <p>FutureCorp AI 超級助理 · 數據來源：Odoo 已確認訂單 · 生成於 2026-05-13</p>
-</footer>
+<div class="footer">
+  AI超級助理 自動生成 · 資料截至 2026/05/14 · 由 Odoo ERP 即時匯出 · @futurecorp_ai_bot
+</div>
 
 <script>
-  const monthLabels = ['1月', '2月', '3月', '4月', '5月'];
-  const monthData = [59542, 21476, 5876, 4203, 6813];
-  const colors = ['#2563eb', '#7c3aed', '#0891b2', '#dc2626', '#16a34a'];
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
 
-  // Bar chart
-  new Chart(document.getElementById('monthChart'), {
-    type: 'bar',
-    data: {
-      labels: monthLabels,
-      datasets: [{
-        label: '營業額 (NTD)',
-        data: monthData,
-        backgroundColor: colors.map(c => c + 'cc'),
-        borderColor: colors,
-        borderWidth: 2,
-        borderRadius: 6,
-      }]
+const tooltipDefaults = {
+  backgroundColor: '#1e2333',
+  padding: 12,
+  cornerRadius: 8,
+  titleFont: { size: 12 },
+  bodyFont: { size: 12 }
+};
+
+new Chart(document.getElementById('chartMonthly'), {
+  type: 'bar',
+  data: {
+    labels: ['1月', '2月', '3月', '4月', '5月*'],
+    datasets: [{
+      label: '月度營收',
+      data: [59542.5, 21476, 5876, 4203, 11828.4],
+      backgroundColor: ['rgba(79,110,247,0.85)','rgba(34,211,166,0.85)','rgba(245,158,11,0.85)','rgba(239,68,68,0.85)','rgba(139,92,246,0.85)'],
+      borderRadius: 8,
+      borderSkipped: false,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { ...tooltipDefaults, callbacks: { label: ctx => ' $' + ctx.raw.toLocaleString() } }
     },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => ' $' + ctx.parsed.y.toLocaleString()
-          }
-        }
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: '#f0f2f8' },
+        ticks: { font: { size: 11 }, callback: val => '$' + (val >= 1000 ? (val/1000).toFixed(0) + 'K' : val) }
       },
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            callback: v => '$' + (v/1000).toFixed(0) + 'k'
-          },
-          grid: { color: '#e2e8f0' }
-        },
-        x: { grid: { display: false } }
-      }
+      x: { grid: { display: false }, ticks: { font: { size: 12 } } }
     }
-  });
+  }
+});
 
-  // Pie chart
-  new Chart(document.getElementById('pieChart'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Acme Corp', '雙星家具', '王志明', '林木建材'],
-      datasets: [{
-        data: [70250, 23963, 2948, 750],
-        backgroundColor: ['#2563eb', '#7c3aed', '#f59e0b', '#10b981'],
-        borderWidth: 2,
-        borderColor: '#fff'
-      }]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      cutout: '60%',
-      plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { font: { size: 11 }, padding: 12 }
-        },
-        tooltip: {
-          callbacks: {
-            label: ctx => ' $' + ctx.parsed.toLocaleString() + ' (' + ((ctx.parsed / 97910) * 100).toFixed(1) + '%)'
-          }
-        }
-      }
+new Chart(document.getElementById('chartCustomer'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Acme Corporation', '雙星家具', '王志明', '林木建材'],
+    datasets: [{
+      data: [75265.4, 23963, 2947.5, 750],
+      backgroundColor: ['#4f6ef7','#22d3a6','#f59e0b','#8b5cf6'],
+      borderWidth: 3,
+      borderColor: '#ffffff',
+      hoverOffset: 8,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '65%',
+    plugins: {
+      legend: { labels: { font: { size: 12 }, usePointStyle: true } },
+      tooltip: { ...tooltipDefaults, callbacks: { label: ctx => ' $' + ctx.raw.toLocaleString() + ' (' + (ctx.raw/102926*100).toFixed(1) + '%)' } }
     }
-  });
+  }
+});
+
+new Chart(document.getElementById('chartSales'), {
+  type: 'bar',
+  data: {
+    labels: ['1月', '2月', '3月', '4月', '5月*'],
+    datasets: [
+      { label: '陳建宏', data: [54706, 17250, 2947.5, 2990, 0], backgroundColor: 'rgba(79,110,247,0.85)', borderRadius: 6 },
+      { label: '林雅婷', data: [4836.5, 4226, 2928.5, 1213, 11828.4], backgroundColor: 'rgba(34,211,166,0.85)', borderRadius: 6 }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { labels: { font: { size: 12 }, usePointStyle: true } },
+      tooltip: { ...tooltipDefaults, callbacks: { label: ctx => ' ' + ctx.dataset.label + ': $' + ctx.raw.toLocaleString() } }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        grid: { color: '#f0f2f8' },
+        ticks: { font: { size: 11 }, callback: val => '$' + (val >= 1000 ? (val/1000).toFixed(0) + 'K' : val) }
+      },
+      x: { grid: { display: false }, ticks: { font: { size: 12 } } }
+    }
+  }
+});
+
+new Chart(document.getElementById('chartCRM'), {
+  type: 'doughnut',
+  data: {
+    labels: ['新潛在客戶 (21)', '已評估 (17)', '提案中 (12)', '成交 (6)'],
+    datasets: [{
+      data: [21, 17, 12, 6],
+      backgroundColor: ['#4f6ef7','#f59e0b','#ef4444','#22d3a6'],
+      borderWidth: 3,
+      borderColor: '#ffffff',
+      hoverOffset: 8,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    cutout: '60%',
+    plugins: {
+      legend: { labels: { font: { size: 12 }, usePointStyle: true } },
+      tooltip: { ...tooltipDefaults, callbacks: { label: ctx => ' ' + ctx.raw + ' 個商機' } }
+    }
+  }
+});
 </script>
+
 </body>
 </html>
